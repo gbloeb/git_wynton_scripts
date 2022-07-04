@@ -7,18 +7,19 @@ library(stringr)
 output_dir<-args[1]
 print(output_dir)
 
-# coverage_files<-list.files("~/Box/GLIS3_ATAC/GLIS3_nolambda_qe-7_sh-30_peaks/count_tables/GLIS3_nolambda_qe-7_sh-30_peak_coverage/",full.names = TRUE)
-# coverage_files_name<-str_split_fixed(
-#   list.files("~/Box/GLIS3_ATAC/GLIS3_nolambda_qe-7_sh-30_peaks/count_tables/GLIS3_nolambda_qe-7_sh-30_peak_coverage/",full.names = FALSE), 
-#   "_ref_peaks_coverage.bed",2)[,1]
-# coverage_file<-fread(coverage_files[1])
-# names<-paste(coverage_file$V1,coverage_file$V2,coverage_file$V3,sep="_")
-# counts<-data.frame(names)
-# for(i in 1:length(coverage_files)) {
-#   coverage_file<-fread(coverage_files[i])
-#   counts[,i+1]<-coverage_file$V11
-#   names(counts)[i+1]<-coverage_files_name[i]
-# }
+coverage_files<-list.files(output_dir,full.names = TRUE)
+coverage_files_name<-str_split_fixed(
+  list.files(output_dir,full.names = FALSE),
+  "_ref_peaks_coverage.bed",2)[,1]
+coverage_file<-fread(coverage_files[1])
+names<-paste(coverage_file$V1,coverage_file$V2,coverage_file$V3,sep="_")
+counts<-data.frame(names)
+for(i in 1:length(coverage_files)) {
+  coverage_file<-fread(coverage_files[i])
+  counts[,i+1]<-coverage_file$V11
+  names(counts)[i+1]<-coverage_files_name[i]
+}
+head(counts)
 # 
 # 
 # counts<-counts[-(grep("JH", counts$name)), ] #Remove unscaffolded 
