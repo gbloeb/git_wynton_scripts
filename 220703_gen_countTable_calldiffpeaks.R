@@ -3,6 +3,7 @@ options(echo=T)
 args = commandArgs(trailingOnly=TRUE)
 library(edgeR)
 library(stringr)
+library(data.table)
 
 output_dir<-args[1]
 print(output_dir)
