@@ -7,11 +7,9 @@ library(data.table)
 
 output_dir<-args[1]
 print(output_dir)
-
-coverage_files<-list.files(output_dir,full.names = TRUE)
-coverage_files_name<-str_split_fixed(
-  list.files(output_dir,full.names = FALSE),
-  "_ref_peaks_coverage.bed",2)[,1]
+setwd(output_dir)
+coverage_files<-setdiff(list.files(), list.dirs(recursive = FALSE, full.names = FALSE))
+coverage_files_name<-str_split_fixed(coverage_files, "_coverage",2)[,1]
 coverage_file<-fread(coverage_files[1])
 names<-paste(coverage_file$V1,coverage_file$V2,coverage_file$V3,sep="_")
 counts<-data.frame(names)
