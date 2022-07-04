@@ -6,6 +6,9 @@ library(stringr)
 library(data.table)
 
 output_dir<-args[1]
+if(length(args)>1){                 #Not yet fully implemented, would allow indicating the control samples in the call of Rscript
+ctrl_samples<-args[2:length(args)]
+}
 print(output_dir)
 setwd(output_dir)
 coverage_files<-setdiff(list.files(), list.dirs(recursive = FALSE, full.names = FALSE))
@@ -25,7 +28,17 @@ write.csv(counts, paste(output_dir,"count_table.csv",sep=""))
 counts<-counts[-(grep("JH", counts$name)), ] #Remove unscaffolded 
 counts<-counts[-(grep("chrUn", counts$name)), ]
 counts<-counts[-(grep("GL", counts$name)), ]
-group<-c("c","c","d","d")
+
+
+if(length(args)==1) {  #In future if args has length >1 than will use those control sample names to set control samples
+ctrl_index<-grep("ctrl", colnames(counts)[2:ncol(counts)], ignore.case=TRUE) #only works if control has ctrl in file names
+
+if(length(ctrl_index)<2){stop(paste("These columns of count matrix contain control please rerun with contol samples indicated:",ctrl_index)) }
+
+group<-vector(mode = "character",length = ncol(counts)-1)
+group[ctrl_index]<-"c" #Mark controls 
+group[-ctrl_index]<-"e"
+}
 
 #prior<-fread("~/Box/GLIS3_ATAC/summary/test_project_mm10_peaks_coverage.tsv")
 
@@ -37,66 +50,56 @@ y<-calcNormFactors((y))
 y<-estimateDisp(y)
 et<-exactTest(y)
 topTags(et)
-glis3DE<-(et$table)
-glis3DE$region<-et$genes$genes
-glis3DE$FDR<-p.adjust(glis3DE$PValue,method = "BH")
-glis3DE<-glis3DE[,c("region","logCPM","logFC","PValue","FDR")]
+TestedPeaks<-(et$table)
+TestedPeaks$region<-et$genes$genes
+TestedPeaks$FDR<-p.adjust(TestedPeaks$PValue,method = "BH")
+TestedPeaks<-TestedPeaks[,c("region","logCPM","logFC","PValue","FDR")]
 
-nrow(glis3DE[glis3DE$FDR<0.05 & glis3DE$logFC>0,])
-nrow(glis3DE[glis3DE$FDR<0.05 & glis3DE$logFC<0,])
-
-volcanoData <- cbind(glis3DE$logFC, -log10(glis3DE$FDR))
+volcanoData <- cbind(TestedPeaks$logFC, -log10(TestedPeaks$FDR))
 colnames(volcanoData) <- c("logFC", "-LogPval")
-DEGs <- glis3DE$FDR < 0.05 & glis3DE$logFC>0
+DEGs <- TestedPeaks$FDR < 0.05 & TestedPeaks$logFC>0
 point.col <- ifelse(DEGs, "red", "black")
+
+pdf(peak_volcanoData.pdf)
 plot(volcanoData, pch = 16, col = point.col, cex = 0.5, xlim=c(-5,5))
+dev.off()
+
+TestedPeaks_up<-TestedPeaks[TestedPeaks$logFC>0 & TestedPeaks$FDR<0.05,]
+TestedPeaks_up_regions<-str_split_fixed(TestedPeaks_up$region,"_",3)
+TestedPeaks_up$chr<-TestedPeaks_up_regions[,1]
+TestedPeaks_up$start<-as.integer(TestedPeaks_up_regions[,2])
+TestedPeaks_up$end<-as.integer(TestedPeaks_up_regions[,3])
+TestedPeaks_up_bed<-TestedPeaks_up[,c("chr","start","end")]
+write.table(TestedPeaks_up_bed, paste(output_dir,"/TestedPeaks_up_0.05.bed",quote = FALSE, row.names = FALSE,col.names = FALSE, sep="\t"))
+
+TestedPeaks_up_01<-TestedPeaks[TestedPeaks$logFC>0 & TestedPeaks$FDR<0.01,]
+TestedPeaks_up_01_regions<-str_split_fixed(TestedPeaks_up_01$region,"_",3)
+TestedPeaks_up_01$chr<-TestedPeaks_up_01_regions[,1]
+TestedPeaks_up_01$start<-as.integer(TestedPeaks_up_01_regions[,2])
+TestedPeaks_up_01$end<-as.integer(TestedPeaks_up_01_regions[,3])
+TestedPeaks_up_01_bed<-TestedPeaks_up_01[,c("chr","start","end")]
+write.table(TestedPeaks_up_01_bed, paste(output_dir,"/TestedPeaks_up_0.01.bed",quote = FALSE, row.names = FALSE,col.names = FALSE, sep="\t"))
+
+TestedPeaks_up_001<-TestedPeaks[TestedPeaks$logFC>0 & TestedPeaks$FDR<0.001,]
+TestedPeaks_up_001_regions<-str_split_fixed(TestedPeaks_up_001$region,"_",3)
+TestedPeaks_up_001$chr<-TestedPeaks_up_001_regions[,1]
+TestedPeaks_up_001$start<-as.integer(TestedPeaks_up_001_regions[,2])
+TestedPeaks_up_001$end<-as.integer(TestedPeaks_up_001_regions[,3])
+TestedPeaks_up_001_bed<-TestedPeaks_up_001[,c("chr","start","end")]
+write.table(TestedPeaks_up_001_bed, paste(output_dir,"/TestedPeaks_up_0.001.bed",quote = FALSE, row.names = FALSE,col.names = FALSE, sep="\t"))
 
 
-glis3DE_up<-glis3DE[glis3DE$logFC>0 & glis3DE$FDR<0.05,]
-glis3DE_up_regions<-str_split_fixed(glis3DE_up$region,"_",3)
-glis3DE_up$chr<-glis3DE_up_regions[,1]
-glis3DE_up$start<-as.integer(glis3DE_up_regions[,2])
-glis3DE_up$end<-as.integer(glis3DE_up_regions[,3])
-glis3DE_up_bed<-glis3DE_up[,c("chr","start","end")]
-write.table(glis3DE_up_bed, "~/Box/GLIS3_ATAC/GLIS3_nolambda_qe-7_sh-30_peaks/homer_input/glis3DE_up_0.05.bed",quote = FALSE, row.names = FALSE,col.names = FALSE, sep="\t")
+TestedPeaks_down<-TestedPeaks[TestedPeaks$logFC<0 & TestedPeaks$FDR<0.05,]
+TestedPeaks_down_regions<-str_split_fixed(TestedPeaks_down$region,"_",3)
+TestedPeaks_down$chr<-TestedPeaks_down_regions[,1]
+TestedPeaks_down$start<-as.integer(TestedPeaks_down_regions[,2])
+TestedPeaks_down$end<-as.integer(TestedPeaks_down_regions[,3])
+TestedPeaks_down_bed<-TestedPeaks_down[,c("chr","start","end")]
+write.table(TestedPeaks_down_bed, paste(output_dir,"/TestedPeaks_down_0.05.bed",quote = FALSE, row.names = FALSE,col.names = FALSE, sep="\t"))
 
-glis3DE_up_01<-glis3DE[glis3DE$logFC>0 & glis3DE$FDR<0.01,]
-glis3DE_up_01_regions<-str_split_fixed(glis3DE_up_01$region,"_",3)
-glis3DE_up_01$chr<-glis3DE_up_01_regions[,1]
-glis3DE_up_01$start<-as.integer(glis3DE_up_01_regions[,2])
-glis3DE_up_01$end<-as.integer(glis3DE_up_01_regions[,3])
-glis3DE_up_01_bed<-glis3DE_up_01[,c("chr","start","end")]
-write.table(glis3DE_up_01_bed, "~/Box/GLIS3_ATAC/GLIS3_nolambda_qe-7_sh-30_peaks/homer_input/glis3DE_up_01.bed",quote = FALSE, row.names = FALSE,col.names = FALSE, sep="\t")
-
-glis3DE_up_001<-glis3DE[glis3DE$logFC>0 & glis3DE$FDR<0.001,]
-glis3DE_up_001_regions<-str_split_fixed(glis3DE_up_001$region,"_",3)
-glis3DE_up_001$chr<-glis3DE_up_001_regions[,1]
-glis3DE_up_001$start<-as.integer(glis3DE_up_001_regions[,2])
-glis3DE_up_001$end<-as.integer(glis3DE_up_001_regions[,3])
-glis3DE_up_001_bed<-glis3DE_up_001[,c("chr","start","end")]
-write.table(glis3DE_up_001_bed, "~/Box/GLIS3_ATAC/GLIS3_nolambda_qe-7_sh-30_peaks/homer_input/glis3DE_up_001.bed",quote = FALSE, row.names = FALSE,col.names = FALSE, sep="\t")
-
-
-glis3DE_up_00001<-glis3DE[glis3DE$logFC>0 & glis3DE$FDR<0.00001,]
-glis3DE_up_00001_regions<-str_split_fixed(glis3DE_up_00001$region,"_",3)
-glis3DE_up_00001$chr<-glis3DE_up_00001_regions[,1]
-glis3DE_up_00001$start<-as.integer(glis3DE_up_00001_regions[,2])
-glis3DE_up_00001$end<-as.integer(glis3DE_up_00001_regions[,3])
-glis3DE_up_00001_bed<-glis3DE_up_00001[,c("chr","start","end")]
-write.table(glis3DE_up_00001_bed, "~/Box/GLIS3_ATAC/GLIS3_nolambda_qe-7_sh-30_peaks/homer_input/glis3DE_up_00001.bed",quote = FALSE, row.names = FALSE,col.names = FALSE, sep="\t")
-
-
-glis3DE_down<-glis3DE[glis3DE$logFC<0 & glis3DE$FDR<0.05,]
-glis3DE_down_regions<-str_split_fixed(glis3DE_down$region,"_",3)
-glis3DE_down$chr<-glis3DE_down_regions[,1]
-glis3DE_down$start<-as.integer(glis3DE_down_regions[,2])
-glis3DE_down$end<-as.integer(glis3DE_down_regions[,3])
-glis3DE_down_bed<-glis3DE_down[,c("chr","start","end")]
-write.table(glis3DE_down_bed, "~/Box/GLIS3_ATAC/GLIS3_nolambda_qe-7_sh-30_peaks/glis3DE_down_0.05.bed",quote = FALSE, row.names = FALSE,col.names = FALSE, sep="\t")
-
-glis3DE_regions<-str_split_fixed(glis3DE$region,"_",3)
-glis3DE$chr<-glis3DE_regions[,1]
-glis3DE$start<-as.integer(glis3DE_regions[,2])
-glis3DE$end<-as.integer(glis3DE_regions[,3])
-glis3DE_bed<-glis3DE[,c("chr","start","end")]
-write.table(glis3DE_bed, "~/Box/GLIS3_ATAC/GLIS3_nolambda_qe-7_sh-30_peaks/homer_input/glis3DE_background.bed",quote = FALSE, row.names = FALSE,col.names = FALSE, sep="\t")
+TestedPeaks_regions<-str_split_fixed(TestedPeaks$region,"_",3)
+TestedPeaks$chr<-TestedPeaks_regions[,1]
+TestedPeaks$start<-as.integer(TestedPeaks_regions[,2])
+TestedPeaks$end<-as.integer(TestedPeaks_regions[,3])
+TestedPeaks_bed<-TestedPeaks[,c("chr","start","end")]
+write.table(TestedPeaks_bed, paste(output_dir,"/TestedPeaks_background.bed",quote = FALSE, row.names = FALSE,col.names = FALSE, sep="\t"))
