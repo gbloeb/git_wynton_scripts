@@ -30,7 +30,7 @@ for(i in 1:length(coverage_files)) {
 }
 head(counts)
 
-write.csv(counts, paste(output_dir,"count_table.csv",sep=""))
+write.csv(counts, paste0("220703_gen_countTable_output/","count_table.csv"), row.names = FALSE)
 
 counts<-counts[-(grep("JH", counts$name)), ] #Remove unscaffolded 
 counts<-counts[-(grep("chrUn", counts$name)), ]
@@ -54,7 +54,7 @@ print(colnames(counts)[2:ncol(counts)][-ctrl_index])
 
 design_matrix<-data.frame(colnames(counts)[2:ncol(counts)],group)
 #prior<-fread("~/Box/GLIS3_ATAC/summary/test_project_mm10_peaks_coverage.tsv")
-write.csv(design_matrix,file = paste0("220703_gen_countTable_output/","design_matrix.csv"))
+write.csv(design_matrix,file = paste0("220703_gen_countTable_output/","design_matrix.csv"), row.names = FALSE)
 
 y<-DGEList(counts = counts[,c(2:ncol(counts))],group=group,remove.zeros = TRUE,genes = counts[,c("names")])
 keep<-filterByExpr(y)
