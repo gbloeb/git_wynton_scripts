@@ -30,23 +30,46 @@
 
 
 INPUT_DIRECTORY=$1
-PEAKS=$2
-OUTPUT_DIRECTORY=$3
+
+OUTPUT_DIRECTORY=$2
+QVAL=$3
+NOLAMBDA=$4
 
 
-PEAKS_BASE="${PEAKS##*/}"
 
 module load CBI bedtools2 r
 
-
-#Call peaks
-
-#Calculate peak coverage
 mkdir $OUTPUT_DIRECTORY
 mkdir $OUTPUT_DIRECTORY/int_files
 
-cd $OUTPUT_DIRECTORY
 
+
+#Make bed file from all the samples to call peaks on
+cat $INPUT_DIRECTORY/*/aligned_mm10_exact/*_shift.bed > $OUTPUT_DIRECTORY/int_files/comb_shift.bed
+ls $INPUT_DIRECTORY/*/aligned_mm10_exact/*_shift.bed > $OUTPUT_DIRECTORY/files_in_comb_shift_bed.txt
+
+#Call peaks
+job_id=$(qsub -terse ~/git_wynton_scripts/macs3_callpeaks_frombed.sh \
+$OUTPUT_DIRECTORY/int_files/comb_shift.bed \
+$OUTPUT_DIRECTORY/int_files/ \
+2.3e9 \
+$QVAL \
+$NOLAMBDA)
+
+
+if [ "$NOLAMBDA" = true ]
+then
+PEAKS=comb_shift.bed_nolambda_q"$QVAL"_noshift_peaks.narrowPeak
+else
+PEAKS=comb_shift.bed_wlambda_q"$QVAL"_noshift_peaks.narrowPeak
+fi
+
+PEAKS_BASE="${PEAKS##*/}"
+
+#Calculate peak coverage
+
+
+cd $OUTPUT_DIRECTORY
 for FULL_SAMPLE in "$INPUT_DIRECTORY"/*_S*
 do
 	SAMPLE=$(basename "$FULL_SAMPLE" .bed)
@@ -63,9 +86,89 @@ Rscript ~/git_wynton_scripts/220703_gen_countTable_calldiffpeaks.R  $OUTPUT_DIRE
 mkdir $OUTPUT_DIRECTORY/homer_output
 
 #Run homer
+#given bp
 qsub ~/git_wynton_scripts/homer_background.sh $OUTPUT_DIRECTORY/homer_output \
 $OUTPUT_DIRECTORY/homer_input/TestedPeaks_up_0.05.bed \
 mm10 \
 given \
+$OUTPUT_DIRECTORY/homer_input/TestedPeaks_background.bed \
+10
+
+qsub ~/git_wynton_scripts/homer_background.sh $OUTPUT_DIRECTORY/homer_output \
+$OUTPUT_DIRECTORY/homer_input/TestedPeaks_up_0.01.bed \
+mm10 \
+given \
+$OUTPUT_DIRECTORY/homer_input/TestedPeaks_background.bed \
+10
+
+qsub ~/git_wynton_scripts/homer_background.sh $OUTPUT_DIRECTORY/homer_output \
+$OUTPUT_DIRECTORY/homer_input/TestedPeaks_up_0.001.bed \
+mm10 \
+given \
+$OUTPUT_DIRECTORY/homer_input/TestedPeaks_background.bed \
+10
+
+qsub ~/git_wynton_scripts/homer_background.sh $OUTPUT_DIRECTORY/homer_output \
+$OUTPUT_DIRECTORY/homer_input/TestedPeaks_down_0.05.bed \
+mm10 \
+given \
+$OUTPUT_DIRECTORY/homer_input/TestedPeaks_background.bed \
+10
+
+#500bp
+qsub ~/git_wynton_scripts/homer_background.sh $OUTPUT_DIRECTORY/homer_output \
+$OUTPUT_DIRECTORY/homer_input/TestedPeaks_up_0.05.bed \
+mm10 \
+500 \
+$OUTPUT_DIRECTORY/homer_input/TestedPeaks_background.bed \
+10
+
+qsub ~/git_wynton_scripts/homer_background.sh $OUTPUT_DIRECTORY/homer_output \
+$OUTPUT_DIRECTORY/homer_input/TestedPeaks_up_0.01.bed \
+mm10 \
+500 \
+$OUTPUT_DIRECTORY/homer_input/TestedPeaks_background.bed \
+10
+
+qsub ~/git_wynton_scripts/homer_background.sh $OUTPUT_DIRECTORY/homer_output \
+$OUTPUT_DIRECTORY/homer_input/TestedPeaks_up_0.001.bed \
+mm10 \
+500 \
+$OUTPUT_DIRECTORY/homer_input/TestedPeaks_background.bed \
+10
+
+qsub ~/git_wynton_scripts/homer_background.sh $OUTPUT_DIRECTORY/homer_output \
+$OUTPUT_DIRECTORY/homer_input/TestedPeaks_down_0.05.bed \
+mm10 \
+500 \
+$OUTPUT_DIRECTORY/homer_input/TestedPeaks_background.bed \
+10
+
+#250bp
+qsub ~/git_wynton_scripts/homer_background.sh $OUTPUT_DIRECTORY/homer_output \
+$OUTPUT_DIRECTORY/homer_input/TestedPeaks_up_0.05.bed \
+mm10 \
+250 \
+$OUTPUT_DIRECTORY/homer_input/TestedPeaks_background.bed \
+10
+
+qsub ~/git_wynton_scripts/homer_background.sh $OUTPUT_DIRECTORY/homer_output \
+$OUTPUT_DIRECTORY/homer_input/TestedPeaks_up_0.01.bed \
+mm10 \
+250 \
+$OUTPUT_DIRECTORY/homer_input/TestedPeaks_background.bed \
+10
+
+qsub ~/git_wynton_scripts/homer_background.sh $OUTPUT_DIRECTORY/homer_output \
+$OUTPUT_DIRECTORY/homer_input/TestedPeaks_up_0.001.bed \
+mm10 \
+250 \
+$OUTPUT_DIRECTORY/homer_input/TestedPeaks_background.bed \
+10
+
+qsub ~/git_wynton_scripts/homer_background.sh $OUTPUT_DIRECTORY/homer_output \
+$OUTPUT_DIRECTORY/homer_input/TestedPeaks_down_0.05.bed \
+mm10 \
+250 \
 $OUTPUT_DIRECTORY/homer_input/TestedPeaks_background.bed \
 10
