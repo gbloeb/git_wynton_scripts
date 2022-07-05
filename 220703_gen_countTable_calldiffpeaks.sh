@@ -29,5 +29,6 @@
 
 
 OUTPUT_DIRECTORY=$1
+module load CBI r
 
 Rscript ~/git_wynton_scripts/220703_gen_countTable_calldiffpeaks.R  $OUTPUT_DIRECTORY
