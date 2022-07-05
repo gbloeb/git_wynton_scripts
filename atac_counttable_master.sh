@@ -43,10 +43,10 @@ mkdir $OUTPUT_DIRECTORY
 if [ "$NOLAMBDA" = true ]
 then
 OUTPUT_DIRECTORY=$OUTPUT_DIRECTORY/nolambda_q"$QVAL"
-PEAKS=comb_shift.bed_nolambda_q"$QVAL"_noshift_peaks.narrowPeak
+PEAKS=$OUTPUT_DIRECTORY/int_files/comb_shift.bed_nolambda_q"$QVAL"_noshift_peaks.narrowPeak
 else
 OUTPUT_DIRECTORY=$OUTPUT_DIRECTORY/wlambda_q"$QVAL"
-PEAKS=comb_shift.bed_wlambda_q"$QVAL"_noshift_peaks.narrowPeak
+PEAKS=$OUTPUT_DIRECTORY/int_files/comb_shift.bed_wlambda_q"$QVAL"_noshift_peaks.narrowPeak
 fi
 
 PEAKS_BASE="${PEAKS##*/}"
