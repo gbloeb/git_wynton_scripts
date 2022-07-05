@@ -61,7 +61,7 @@ mkdir $OUTPUT_DIRECTORY/int_files
 
 #Make bed file from all the samples to call peaks on
 cat $INPUT_DIRECTORY/*/aligned_mm10_exact/*_shift.bed > $OUTPUT_DIRECTORY/int_files/comb_shift.bed
-ls $INPUT_DIRECTORY/*/aligned_mm10_exact/*_shift.bed > $OUTPUT_DIRECTORY/files_in_comb_shift_bed.txt
+ls $INPUT_DIRECTORY/*/aligned_mm10_exact/*_shift.bed > $OUTPUT_DIRECTORY/int_files/files_in_comb_shift_bed.txt
 
 #Call peaks
 job_id=$(qsub -terse ~/git_wynton_scripts/macs3_callpeaks_frombed.sh \
