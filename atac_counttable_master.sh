@@ -64,7 +64,7 @@ cat $INPUT_DIRECTORY/*/aligned_mm10_exact/*_shift.bed > $OUTPUT_DIRECTORY/int_fi
 ls $INPUT_DIRECTORY/*/aligned_mm10_exact/*_shift.bed > $OUTPUT_DIRECTORY/int_files/files_in_comb_shift_bed.txt
 
 #Call peaks
-job_id=$(qsub -terse ~/git_wynton_scripts/macs3_callpeaks_frombed.sh \
+job_id=$(qsub -terse ~/git_wynton_scripts/macs3_callpeaks_frombed_noshift.sh \
 $OUTPUT_DIRECTORY/int_files/comb_shift.bed \
 $OUTPUT_DIRECTORY/int_files/ \
 2.3e9 \
