@@ -6,6 +6,12 @@ library(stringr)
 library(data.table)
 
 output_dir<-args[1]
+
+dir.create("homer_input")
+dir.create("220703_gen_countTable_output")
+
+
+
 if(length(args)>1){                 #Not yet fully implemented, would allow indicating the control samples in the call of Rscript
 ctrl_samples<-args[2:length(args)]
 }
@@ -47,7 +53,7 @@ print(colnames(counts)[2:ncol(counts)][-ctrl_index])
 
 design_matrix<-data.frame(colnames(counts)[2:ncol(counts)],group)
 #prior<-fread("~/Box/GLIS3_ATAC/summary/test_project_mm10_peaks_coverage.tsv")
-write.csv(design_matrix,file = "design_matrix.csv")
+write.csv(design_matrix,file = paste0("220703_gen_countTable_output/","design_matrix.csv"))
 
 y<-DGEList(counts = counts[,c(2:ncol(counts))],group=group,remove.zeros = TRUE,genes = counts[,c("names")])
 keep<-filterByExpr(y)
@@ -66,11 +72,10 @@ colnames(volcanoData) <- c("logFC", "-LogPval")
 DEGs <- TestedPeaks$FDR < 0.05 & TestedPeaks$logFC>0
 point.col <- ifelse(DEGs, "red", "black")
 
-pdf("peak_volcanoData.pdf")
+pdf(paste0("220703_gen_countTable_output/","peak_volcanoData.pdf"))
 plot(volcanoData, pch = 16, col = point.col, cex = 0.5, xlim=c(-5,5))
 dev.off()
 
-dir.create("homer_input")
 
 TestedPeaks_up<-TestedPeaks[TestedPeaks$logFC>0 & TestedPeaks$FDR<0.05,]
 TestedPeaks_up_regions<-str_split_fixed(TestedPeaks_up$region,"_",3)
@@ -78,7 +83,7 @@ TestedPeaks_up$chr<-TestedPeaks_up_regions[,1]
 TestedPeaks_up$start<-as.integer(TestedPeaks_up_regions[,2])
 TestedPeaks_up$end<-as.integer(TestedPeaks_up_regions[,3])
 TestedPeaks_up_bed<-TestedPeaks_up[,c("chr","start","end")]
-write.table(TestedPeaks_up_bed, paste0(output_dir,"homer_input/TestedPeaks_up_0.05.bed",quote = FALSE, row.names = FALSE,col.names = FALSE, sep="\t"))
+write.table(TestedPeaks_up_bed, paste0(output_dir,"/homer_input/TestedPeaks_up_0.05.bed",quote = FALSE, row.names = FALSE,col.names = FALSE, sep="\t"))
 
 TestedPeaks_up_01<-TestedPeaks[TestedPeaks$logFC>0 & TestedPeaks$FDR<0.01,]
 TestedPeaks_up_01_regions<-str_split_fixed(TestedPeaks_up_01$region,"_",3)
@@ -86,7 +91,7 @@ TestedPeaks_up_01$chr<-TestedPeaks_up_01_regions[,1]
 TestedPeaks_up_01$start<-as.integer(TestedPeaks_up_01_regions[,2])
 TestedPeaks_up_01$end<-as.integer(TestedPeaks_up_01_regions[,3])
 TestedPeaks_up_01_bed<-TestedPeaks_up_01[,c("chr","start","end")]
-write.table(TestedPeaks_up_01_bed, paste0(output_dir,"homer_input/TestedPeaks_up_0.01.bed",quote = FALSE, row.names = FALSE,col.names = FALSE, sep="\t"))
+write.table(TestedPeaks_up_01_bed, paste0(output_dir,"/homer_input/TestedPeaks_up_0.01.bed",quote = FALSE, row.names = FALSE,col.names = FALSE, sep="\t"))
 
 TestedPeaks_up_001<-TestedPeaks[TestedPeaks$logFC>0 & TestedPeaks$FDR<0.001,]
 TestedPeaks_up_001_regions<-str_split_fixed(TestedPeaks_up_001$region,"_",3)
@@ -94,7 +99,7 @@ TestedPeaks_up_001$chr<-TestedPeaks_up_001_regions[,1]
 TestedPeaks_up_001$start<-as.integer(TestedPeaks_up_001_regions[,2])
 TestedPeaks_up_001$end<-as.integer(TestedPeaks_up_001_regions[,3])
 TestedPeaks_up_001_bed<-TestedPeaks_up_001[,c("chr","start","end")]
-write.table(TestedPeaks_up_001_bed, paste0(output_dir,"homer_input/TestedPeaks_up_0.001.bed",quote = FALSE, row.names = FALSE,col.names = FALSE, sep="\t"))
+write.table(TestedPeaks_up_001_bed, paste0(output_dir,"/homer_input/TestedPeaks_up_0.001.bed",quote = FALSE, row.names = FALSE,col.names = FALSE, sep="\t"))
 
 
 TestedPeaks_down<-TestedPeaks[TestedPeaks$logFC<0 & TestedPeaks$FDR<0.05,]
@@ -103,11 +108,11 @@ TestedPeaks_down$chr<-TestedPeaks_down_regions[,1]
 TestedPeaks_down$start<-as.integer(TestedPeaks_down_regions[,2])
 TestedPeaks_down$end<-as.integer(TestedPeaks_down_regions[,3])
 TestedPeaks_down_bed<-TestedPeaks_down[,c("chr","start","end")]
-write.table(TestedPeaks_down_bed, paste0(output_dir,"homer_input/TestedPeaks_down_0.05.bed",quote = FALSE, row.names = FALSE,col.names = FALSE, sep="\t"))
+write.table(TestedPeaks_down_bed, paste0(output_dir,"/homer_input/TestedPeaks_down_0.05.bed",quote = FALSE, row.names = FALSE,col.names = FALSE, sep="\t"))
 
 TestedPeaks_regions<-str_split_fixed(TestedPeaks$region,"_",3)
 TestedPeaks$chr<-TestedPeaks_regions[,1]
 TestedPeaks$start<-as.integer(TestedPeaks_regions[,2])
 TestedPeaks$end<-as.integer(TestedPeaks_regions[,3])
 TestedPeaks_bed<-TestedPeaks[,c("chr","start","end")]
-write.table(TestedPeaks_bed, paste0(output_dir,"homer_input/TestedPeaks_background.bed",quote = FALSE, row.names = FALSE,col.names = FALSE, sep="\t"))
+write.table(TestedPeaks_bed, paste0(output_dir,"/homer_input/TestedPeaks_background.bed",quote = FALSE, row.names = FALSE,col.names = FALSE, sep="\t"))
