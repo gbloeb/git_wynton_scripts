@@ -7,6 +7,7 @@ library(data.table)
 
 output_dir<-args[1]
 
+setwd(output_dir)
 dir.create("homer_input")
 dir.create("220703_gen_countTable_output")
 
@@ -16,7 +17,7 @@ if(length(args)>1){                 #Not yet fully implemented, would allow indi
 ctrl_samples<-args[2:length(args)]
 }
 print(output_dir)
-setwd(output_dir)
+
 coverage_files<-setdiff(list.files(), list.dirs(recursive = FALSE, full.names = FALSE))
 coverage_files_name<-str_split_fixed(coverage_files, "_coverage",2)[,1]
 coverage_file<-fread(coverage_files[1])
