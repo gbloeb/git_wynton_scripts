@@ -57,4 +57,8 @@ do
 done
 
 #Make count table, homer input files, volcano plot
-Rscript 220703_gen_countTable_calldiffpeaks.R $OUTPUT_DIRECTORY
+Rscript ~/git_wynton_scripts/220703_gen_countTable_calldiffpeaks.R  $OUTPUT_DIRECTORY
+
+mkdir $OUTPUT_DIRECTORY/homer_output
+
+#Run homer output
