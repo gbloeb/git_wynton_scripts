@@ -64,12 +64,12 @@ cat $INPUT_DIRECTORY/*/aligned_mm10_exact/*_shift.bed > $OUTPUT_DIRECTORY/int_fi
 ls $INPUT_DIRECTORY/*/aligned_mm10_exact/*_shift.bed > $OUTPUT_DIRECTORY/int_files/files_in_comb_shift_bed.txt
 
 #Call peaks
-job_id=$(qsub -terse ~/git_wynton_scripts/macs3_callpeaks_frombed_noshift.sh \
+qsub -N callpeaks_"$QVAL"_"$NOLAMBDA" ~/git_wynton_scripts/macs3_callpeaks_frombed_noshift.sh \
 $OUTPUT_DIRECTORY/int_files/comb_shift.bed \
 $OUTPUT_DIRECTORY/int_files/ \
 2.3e9 \
 $QVAL \
-$NOLAMBDA)
+$NOLAMBDA
 
 
 
@@ -89,34 +89,39 @@ do
 done
 
 #Make count table, homer input files, volcano plot
-Rscript ~/git_wynton_scripts/220703_gen_countTable_calldiffpeaks.R  $OUTPUT_DIRECTORY
+qsub -N count_table_"$QVAL"_"$NOLAMBDA" -hold_jid callpeaks_"$QVAL"_"$NOLAMBDA" \
+~/git_wynton_scripts/220703_gen_countTable_calldiffpeaks.sh  $OUTPUT_DIRECTORY
 
 mkdir $OUTPUT_DIRECTORY/homer_output
 
 #Run homer
 #given bp
-qsub ~/git_wynton_scripts/homer_background.sh $OUTPUT_DIRECTORY/homer_output \
+qsub -hold_jid count_table_"$QVAL"_"$NOLAMBDA" \
+~/git_wynton_scripts/homer_background.sh $OUTPUT_DIRECTORY/homer_output \
 $OUTPUT_DIRECTORY/homer_input/TestedPeaks_up_0.05.bed \
 mm10 \
 given \
 $OUTPUT_DIRECTORY/homer_input/TestedPeaks_background.bed \
 10
 
-qsub ~/git_wynton_scripts/homer_background.sh $OUTPUT_DIRECTORY/homer_output \
+qsub -hold_jid count_table_"$QVAL"_"$NOLAMBDA" \
+~/git_wynton_scripts/homer_background.sh $OUTPUT_DIRECTORY/homer_output \
 $OUTPUT_DIRECTORY/homer_input/TestedPeaks_up_0.01.bed \
 mm10 \
 given \
 $OUTPUT_DIRECTORY/homer_input/TestedPeaks_background.bed \
 10
 
-qsub ~/git_wynton_scripts/homer_background.sh $OUTPUT_DIRECTORY/homer_output \
+qsub -hold_jid count_table_"$QVAL"_"$NOLAMBDA" \ 
+~/git_wynton_scripts/homer_background.sh $OUTPUT_DIRECTORY/homer_output \
 $OUTPUT_DIRECTORY/homer_input/TestedPeaks_up_0.001.bed \
 mm10 \
 given \
 $OUTPUT_DIRECTORY/homer_input/TestedPeaks_background.bed \
 10
 
-qsub ~/git_wynton_scripts/homer_background.sh $OUTPUT_DIRECTORY/homer_output \
+qsub -hold_jid count_table_"$QVAL"_"$NOLAMBDA" \
+~/git_wynton_scripts/homer_background.sh $OUTPUT_DIRECTORY/homer_output \
 $OUTPUT_DIRECTORY/homer_input/TestedPeaks_down_0.05.bed \
 mm10 \
 given \
@@ -124,28 +129,32 @@ $OUTPUT_DIRECTORY/homer_input/TestedPeaks_background.bed \
 10
 
 #500bp
-qsub ~/git_wynton_scripts/homer_background.sh $OUTPUT_DIRECTORY/homer_output \
+qsub -hold_jid count_table_"$QVAL"_"$NOLAMBDA" \
+~/git_wynton_scripts/homer_background.sh $OUTPUT_DIRECTORY/homer_output \
 $OUTPUT_DIRECTORY/homer_input/TestedPeaks_up_0.05.bed \
 mm10 \
 500 \
 $OUTPUT_DIRECTORY/homer_input/TestedPeaks_background.bed \
 10
 
-qsub ~/git_wynton_scripts/homer_background.sh $OUTPUT_DIRECTORY/homer_output \
+qsub -hold_jid count_table_"$QVAL"_"$NOLAMBDA" \
+~/git_wynton_scripts/homer_background.sh $OUTPUT_DIRECTORY/homer_output \
 $OUTPUT_DIRECTORY/homer_input/TestedPeaks_up_0.01.bed \
 mm10 \
 500 \
 $OUTPUT_DIRECTORY/homer_input/TestedPeaks_background.bed \
 10
 
-qsub ~/git_wynton_scripts/homer_background.sh $OUTPUT_DIRECTORY/homer_output \
+qsub -hold_jid count_table_"$QVAL"_"$NOLAMBDA" \
+~/git_wynton_scripts/homer_background.sh $OUTPUT_DIRECTORY/homer_output \
 $OUTPUT_DIRECTORY/homer_input/TestedPeaks_up_0.001.bed \
 mm10 \
 500 \
 $OUTPUT_DIRECTORY/homer_input/TestedPeaks_background.bed \
 10
 
-qsub ~/git_wynton_scripts/homer_background.sh $OUTPUT_DIRECTORY/homer_output \
+qsub -hold_jid count_table_"$QVAL"_"$NOLAMBDA" \
+~/git_wynton_scripts/homer_background.sh $OUTPUT_DIRECTORY/homer_output \
 $OUTPUT_DIRECTORY/homer_input/TestedPeaks_down_0.05.bed \
 mm10 \
 500 \
@@ -153,28 +162,32 @@ $OUTPUT_DIRECTORY/homer_input/TestedPeaks_background.bed \
 10
 
 #250bp
-qsub ~/git_wynton_scripts/homer_background.sh $OUTPUT_DIRECTORY/homer_output \
+qsub -hold_jid count_table_"$QVAL"_"$NOLAMBDA" \
+~/git_wynton_scripts/homer_background.sh $OUTPUT_DIRECTORY/homer_output \
 $OUTPUT_DIRECTORY/homer_input/TestedPeaks_up_0.05.bed \
 mm10 \
 250 \
 $OUTPUT_DIRECTORY/homer_input/TestedPeaks_background.bed \
 10
 
-qsub ~/git_wynton_scripts/homer_background.sh $OUTPUT_DIRECTORY/homer_output \
+qsub -hold_jid count_table_"$QVAL"_"$NOLAMBDA" \
+~/git_wynton_scripts/homer_background.sh $OUTPUT_DIRECTORY/homer_output \
 $OUTPUT_DIRECTORY/homer_input/TestedPeaks_up_0.01.bed \
 mm10 \
 250 \
 $OUTPUT_DIRECTORY/homer_input/TestedPeaks_background.bed \
 10
 
-qsub ~/git_wynton_scripts/homer_background.sh $OUTPUT_DIRECTORY/homer_output \
+qsub -hold_jid count_table_"$QVAL"_"$NOLAMBDA" \
+~/git_wynton_scripts/homer_background.sh $OUTPUT_DIRECTORY/homer_output \
 $OUTPUT_DIRECTORY/homer_input/TestedPeaks_up_0.001.bed \
 mm10 \
 250 \
 $OUTPUT_DIRECTORY/homer_input/TestedPeaks_background.bed \
 10
 
-qsub ~/git_wynton_scripts/homer_background.sh $OUTPUT_DIRECTORY/homer_output \
+qsub -hold_jid count_table_"$QVAL"_"$NOLAMBDA" \
+~/git_wynton_scripts/homer_background.sh $OUTPUT_DIRECTORY/homer_output \
 $OUTPUT_DIRECTORY/homer_input/TestedPeaks_down_0.05.bed \
 mm10 \
 250 \
