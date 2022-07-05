@@ -30,18 +30,33 @@
 
 
 INPUT_DIRECTORY=$1
-
-OUTPUT_DIRECTORY=$2
+OUTPUT_DIRECTORY=$2 #Will make a directory within this with the correct qval and lambda of called peaks
 QVAL=$3
 NOLAMBDA=$4
-
-
 
 module load CBI bedtools2 r
 
 mkdir $OUTPUT_DIRECTORY
-mkdir $OUTPUT_DIRECTORY/int_files
 
+#Now reset OUTPUT_DIRECTORY to correspond to the subdirectory
+
+if [ "$NOLAMBDA" = true ]
+then
+OUTPUT_DIRECTORY=$OUTPUT_DIRECTORY/nolambda_q"$QVAL"
+PEAKS=comb_shift.bed_nolambda_q"$QVAL"_noshift_peaks.narrowPeak
+else
+OUTPUT_DIRECTORY=$OUTPUT_DIRECTORY/wlambda_q"$QVAL"
+PEAKS=comb_shift.bed_wlambda_q"$QVAL"_noshift_peaks.narrowPeak
+fi
+
+PEAKS_BASE="${PEAKS##*/}"
+
+
+
+
+
+mkdir $OUTPUT_DIRECTORY
+mkdir $OUTPUT_DIRECTORY/int_files
 
 
 #Make bed file from all the samples to call peaks on
@@ -57,14 +72,7 @@ $QVAL \
 $NOLAMBDA)
 
 
-if [ "$NOLAMBDA" = true ]
-then
-PEAKS=comb_shift.bed_nolambda_q"$QVAL"_noshift_peaks.narrowPeak
-else
-PEAKS=comb_shift.bed_wlambda_q"$QVAL"_noshift_peaks.narrowPeak
-fi
 
-PEAKS_BASE="${PEAKS##*/}"
 
 #Calculate peak coverage
 
