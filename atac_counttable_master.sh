@@ -33,6 +33,7 @@ INPUT_DIRECTORY=$1
 PEAKS=$2
 OUTPUT_DIRECTORY=$3
 
+
 PEAKS_BASE="${PEAKS##*/}"
 
 module load CBI bedtools2 r
@@ -61,4 +62,10 @@ Rscript ~/git_wynton_scripts/220703_gen_countTable_calldiffpeaks.R  $OUTPUT_DIRE
 
 mkdir $OUTPUT_DIRECTORY/homer_output
 
-#Run homer output
+#Run homer
+qsub ~/git_wynton_scripts/homer_background.sh $OUTPUT_DIRECTORY/homer_output \
+$OUTPUT_DIRECTORY/homer_input/TestedPeaks_up_0.05.bed \
+mm10 \
+given \
+$OUTPUT_DIRECTORY/homer_input/TestedPeaks_background.bed \
+10
