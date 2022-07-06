@@ -19,7 +19,7 @@
 
 #$ -l scratch=50G
 
-#$ -l h_rt=20:29:30
+#$ -l h_rt=00:29:30
 
 #$ -pe smp 1
 
@@ -49,10 +49,6 @@ OUTPUT_DIRECTORY=$OUTPUT_DIRECTORY/wlambda_q"$QVAL"
 PEAKS=$OUTPUT_DIRECTORY/int_files/comb_shift.bed_wlambda_q"$QVAL"_noshift_peaks.narrowPeak
 fi
 
-PEAKS_BASE="${PEAKS##*/}"
-
-
-
 
 
 mkdir $OUTPUT_DIRECTORY
@@ -73,23 +69,17 @@ $NOLAMBDA
 
 
 
-
 #Calculate peak coverage
 
+qsub -N peakcov_"$QVAL"_"$NOLAMBDA" -hold_jid callpeaks_"$QVAL"_"$NOLAMBDA" \
+~/git_wynton_scripts/atac_counttable_bedcoverage.sh \
+$OUTPUT_DIRECTORY \
+$INPUT_DIRECTORY \
+$PEAKS
 
-cd $OUTPUT_DIRECTORY
-for FULL_SAMPLE in "$INPUT_DIRECTORY"/*_S*
-do
-	SAMPLE=$(basename "$FULL_SAMPLE" .bed)
-	echo $SAMPLE
-	READS="$INPUT_DIRECTORY"/"$SAMPLE"/aligned_mm10_exact/"$SAMPLE"_shift.bed
-
-  	awk '$1 !~ /_/' $READS > $OUTPUT_DIRECTORY/int_files/"$SAMPLE"_stdChr.bed #Remove nonstandard chromosomes
-	bedtools coverage -a $PEAKS -b $OUTPUT_DIRECTORY/int_files/"$SAMPLE"_stdChr.bed > $OUTPUT_DIRECTORY/"$SAMPLE"_coverage_"$PEAKS_BASE"
-done
 
 #Make count table, homer input files, volcano plot
-qsub -N count_table_"$QVAL"_"$NOLAMBDA" -hold_jid callpeaks_"$QVAL"_"$NOLAMBDA" \
+qsub -N count_table_"$QVAL"_"$NOLAMBDA" -hold_jid peakcov_"$QVAL"_"$NOLAMBDA" \
 ~/git_wynton_scripts/220703_gen_countTable_calldiffpeaks.sh  $OUTPUT_DIRECTORY
 
 mkdir $OUTPUT_DIRECTORY/homer_output
