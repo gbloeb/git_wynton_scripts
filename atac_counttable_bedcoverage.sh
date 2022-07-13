@@ -31,7 +31,20 @@ OUTPUT_DIRECTORY=$1
 INPUT_DIRECTORY=$2
 PEAKS=$3
 
+
+module load CBI bedtools2
+
+
+echo "OUTPUT_DIRECTORY"
+echo $OUTPUT_DIRECTORY
+echo "INPUT_DIRECTORY"
+echo $INPUT_DIRECTORY
+echo "PEAKS"
+echo $PEAKS
+
 PEAKS_BASE="${PEAKS##*/}"
+echo "PEAKS_BASE"
+echo $PEAKS_BASE
 
 cd $OUTPUT_DIRECTORY
 for FULL_SAMPLE in "$INPUT_DIRECTORY"/*_S*
@@ -39,6 +52,9 @@ do
 	SAMPLE=$(basename "$FULL_SAMPLE" .bed)
 	echo $SAMPLE
 	READS="$INPUT_DIRECTORY"/"$SAMPLE"/aligned_mm10_exact/"$SAMPLE"_shift.bed
+	
+	echo "READS"
+	echo $READS
 
   	awk '$1 !~ /_/' $READS > $OUTPUT_DIRECTORY/int_files/"$SAMPLE"_stdChr.bed #Remove nonstandard chromosomes
 	bedtools coverage -a $PEAKS -b $OUTPUT_DIRECTORY/int_files/"$SAMPLE"_stdChr.bed > $OUTPUT_DIRECTORY/"$SAMPLE"_coverage_"$PEAKS_BASE"
