@@ -34,7 +34,7 @@ CTRL2=$3
 CTRL3=$4
 CTRL4=$5
 CTRL5=$6
-CTRL6=$7
+
 
 
 module load CBI r
@@ -54,10 +54,6 @@ echo $CTRL4
 echo "CTRL5"
 echo $CTRL5
 
-echo "CTRL6"
-echo $CTRL6
 
-echo "CTRL7"
-echo $CTRL7
 
-Rscript ~/git_wynton_scripts/220703_gen_countTable_calldiffpeaks.R  $OUTPUT_DIRECTORY $CTRL1 $CTRL2 $CTRL3 $CTRL4 $CTRL5 $CTRL6
+Rscript ~/git_wynton_scripts/220703_gen_countTable_calldiffpeaks.R  $OUTPUT_DIRECTORY $CTRL1 $CTRL2 $CTRL3 $CTRL4 $CTRL5 
