@@ -123,6 +123,22 @@ TestedPeaks_down$end<-as.integer(TestedPeaks_down_regions[,3])
 TestedPeaks_down_bed<-TestedPeaks_down[,c("chr","start","end")]
 write.table(TestedPeaks_down_bed, paste0(output_dir,"/homer_input/TestedPeaks_down_0.05.bed"),quote = FALSE, row.names = FALSE,col.names = FALSE, sep="\t")
 
+TestedPeaks_down<-TestedPeaks[TestedPeaks$logFC<0 & TestedPeaks$FDR<0.01,]
+TestedPeaks_down_regions<-str_split_fixed(TestedPeaks_down$region,"_",3)
+TestedPeaks_down$chr<-TestedPeaks_down_regions[,1]
+TestedPeaks_down$start<-as.integer(TestedPeaks_down_regions[,2])
+TestedPeaks_down$end<-as.integer(TestedPeaks_down_regions[,3])
+TestedPeaks_down_bed<-TestedPeaks_down[,c("chr","start","end")]
+write.table(TestedPeaks_down_bed, paste0(output_dir,"/homer_input/TestedPeaks_down_0.01.bed"),quote = FALSE, row.names = FALSE,col.names = FALSE, sep="\t")
+
+TestedPeaks_down<-TestedPeaks[TestedPeaks$logFC<0 & TestedPeaks$FDR<0.001,]
+TestedPeaks_down_regions<-str_split_fixed(TestedPeaks_down$region,"_",3)
+TestedPeaks_down$chr<-TestedPeaks_down_regions[,1]
+TestedPeaks_down$start<-as.integer(TestedPeaks_down_regions[,2])
+TestedPeaks_down$end<-as.integer(TestedPeaks_down_regions[,3])
+TestedPeaks_down_bed<-TestedPeaks_down[,c("chr","start","end")]
+write.table(TestedPeaks_down_bed, paste0(output_dir,"/homer_input/TestedPeaks_down_0.001.bed"),quote = FALSE, row.names = FALSE,col.names = FALSE, sep="\t")
+
 TestedPeaks_regions<-str_split_fixed(TestedPeaks$region,"_",3)
 TestedPeaks$chr<-TestedPeaks_regions[,1]
 TestedPeaks$start<-as.integer(TestedPeaks_regions[,2])
