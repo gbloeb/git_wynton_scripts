@@ -5,6 +5,9 @@ library(edgeR)
 library(stringr)
 library(data.table)
 
+#counts<-read.csv("~/count_table.csv")
+#args<-c("trial","ML3_rep2_Cont1_200k_S10","ML3_rep2_Cont2_200k_S11","ML3_rep2_Cont3_200k_S12")
+
 output_dir<-args[1]
 
 setwd(output_dir)
@@ -37,15 +40,19 @@ counts<-counts[-(grep("chrUn", counts$name)), ]
 counts<-counts[-(grep("GL", counts$name)), ]
 
 
-if(length(args)==1) {  #In future if args has length >1 than will use those control sample names to set control samples
-ctrl_index<-grep("ctrl", colnames(counts)[2:ncol(counts)], ignore.case=TRUE) #only works if control has ctrl in file names
+if(length(args)==1) {  #If no control samples are given, will attempt to search for ones that have "ctrl" in name
 
-if(length(ctrl_index)<2){stop(paste("These columns of count matrix contain control please rerun with contol samples indicated:",ctrl_index)) }
+  ctrl_index<-grep("ctrl", colnames(counts)[2:ncol(counts)], ignore.case=TRUE) #only works if control has ctrl in file names
+  if(length(ctrl_index)<2){stop(paste("These columns of count matrix contain control please rerun with contol samples indicated:",ctrl_index)) }
+
+} else {    #else will use control sample names to select controls
+  ctrl_index<-match(ctrl_samples, colnames(counts)[2:ncol(counts)]) #only works if control has ctrl in file names
+}
 
 group<-vector(mode = "character",length = ncol(counts)-1)
 group[ctrl_index]<-"c" #Mark controls 
 group[-ctrl_index]<-"e"
-}
+
 
 print("Ctrl samples are:")
 print(colnames(counts)[2:ncol(counts)][ctrl_index])
@@ -58,6 +65,11 @@ write.csv(design_matrix,file = paste0("220703_gen_countTable_output/","design_ma
 
 y<-DGEList(counts = counts[,c(2:ncol(counts))],group=group,remove.zeros = TRUE,genes = counts[,c("names")])
 keep<-filterByExpr(y)
+
+pdf(paste0("220703_gen_countTable_output/","MDSplot.pdf"))
+plotMDS(y,labels = group)
+dev.off()
+
 y<-y[keep, , keep.lib.sizes=FALSE]
 y<-calcNormFactors((y))
 y<-estimateDisp(y)
