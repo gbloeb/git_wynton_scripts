@@ -37,7 +37,27 @@ CTRL5=$6
 CTRL6=$7
 
 
-
 module load CBI r
+
+echo "CTRL1"
+echo $CTRL1
+
+echo "CTRL2"
+echo $CTRL2
+
+echo "CTRL3"
+echo $CTRL3
+
+echo "CTRL4"
+echo $CTRL4
+
+echo "CTRL5"
+echo $CTRL5
+
+echo "CTRL6"
+echo $CTRL6
+
+echo "CTRL7"
+echo $CTRL7
 
 Rscript ~/git_wynton_scripts/220703_gen_countTable_calldiffpeaks.R  $OUTPUT_DIRECTORY $CTRL1 $CTRL2 $CTRL3 $CTRL4 $CTRL5 $CTRL6
