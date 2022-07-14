@@ -42,6 +42,27 @@ CTRL6=$10
 
 module load CBI bedtools2 r
 
+echo "CTRL1"
+echo $CTRL1
+
+echo "CTRL2"
+echo $CTRL2
+
+echo "CTRL3"
+echo $CTRL3
+
+echo "CTRL4"
+echo $CTRL4
+
+echo "CTRL5"
+echo $CTRL5
+
+echo "CTRL6"
+echo $CTRL6
+
+echo "CTRL7"
+echo $CTRL7
+
 mkdir $OUTPUT_DIRECTORY
 
 #Now reset OUTPUT_DIRECTORY to correspond to the subdirectory
