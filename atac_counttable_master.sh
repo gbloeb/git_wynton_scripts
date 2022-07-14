@@ -33,6 +33,12 @@ INPUT_DIRECTORY=$1
 OUTPUT_DIRECTORY=$2 #Will make a directory within this with the correct qval and lambda of called peaks
 QVAL=$3
 NOLAMBDA=$4
+CTRL1=$5
+CTRL2=$6
+CTRL3=$7
+CTRL4=$8
+CTRL5=$9
+CTRL6=$10
 
 module load CBI bedtools2 r
 
@@ -80,7 +86,7 @@ $PEAKS
 
 #Make count table, homer input files, volcano plot
 qsub -N count_table_"$QVAL"_"$NOLAMBDA" -hold_jid peakcov_"$QVAL"_"$NOLAMBDA" \
-~/git_wynton_scripts/220703_gen_countTable_calldiffpeaks.sh  $OUTPUT_DIRECTORY
+~/git_wynton_scripts/220703_gen_countTable_calldiffpeaks.sh  $OUTPUT_DIRECTORY $CTRL1 $CTRL2 $CTRL3 $CTRL4 $CTRL5 $CTRL6
 
 mkdir $OUTPUT_DIRECTORY/homer_output
 
