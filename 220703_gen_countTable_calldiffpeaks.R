@@ -46,7 +46,7 @@ if(length(args)==1) {  #If no control samples are given, will attempt to search 
   if(length(ctrl_index)<2){stop(paste("These columns of count matrix contain control please rerun with contol samples indicated:",ctrl_index)) }
 
 } else {    #else will use control sample names to select controls
-  ctrl_index<-match(ctrl_samples, colnames(counts)[2:ncol(counts)]) #only works if control has ctrl in file names
+  ctrl_index<-match(ctrl_samples, colnames(counts)[2:ncol(counts)]) 
 }
 
 group<-vector(mode = "character",length = ncol(counts)-1)
