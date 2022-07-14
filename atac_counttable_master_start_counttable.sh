@@ -77,27 +77,27 @@ mkdir $OUTPUT_DIRECTORY
 mkdir $OUTPUT_DIRECTORY/int_files
 
 
-#Make bed file from all the samples to call peaks on
-cat $INPUT_DIRECTORY/*/aligned_mm10_exact/*_shift.bed > $OUTPUT_DIRECTORY/int_files/comb_shift.bed
-ls $INPUT_DIRECTORY/*/aligned_mm10_exact/*_shift.bed > $OUTPUT_DIRECTORY/int_files/files_in_comb_shift_bed.txt
-
-#Call peaks
-qsub -N callpeaks_"$QVAL"_"$NOLAMBDA" ~/git_wynton_scripts/macs3_callpeaks_frombed_noshift.sh \
-$OUTPUT_DIRECTORY/int_files/comb_shift.bed \
-$OUTPUT_DIRECTORY/int_files/ \
-2.3e9 \
-$QVAL \
-$NOLAMBDA
-
-
-
-#Calculate peak coverage
-
-qsub -N peakcov_"$QVAL"_"$NOLAMBDA" -hold_jid callpeaks_"$QVAL"_"$NOLAMBDA" \
-~/git_wynton_scripts/atac_counttable_bedcoverage.sh \
-$OUTPUT_DIRECTORY \
-$INPUT_DIRECTORY \
-$PEAKS
+# Make bed file from all the samples to call peaks on
+# cat $INPUT_DIRECTORY/*/aligned_mm10_exact/*_shift.bed > $OUTPUT_DIRECTORY/int_files/comb_shift.bed
+# ls $INPUT_DIRECTORY/*/aligned_mm10_exact/*_shift.bed > $OUTPUT_DIRECTORY/int_files/files_in_comb_shift_bed.txt
+# 
+# Call peaks
+# qsub -N callpeaks_"$QVAL"_"$NOLAMBDA" ~/git_wynton_scripts/macs3_callpeaks_frombed_noshift.sh \
+# $OUTPUT_DIRECTORY/int_files/comb_shift.bed \
+# $OUTPUT_DIRECTORY/int_files/ \
+# 2.3e9 \
+# $QVAL \
+# $NOLAMBDA
+# 
+# 
+# 
+# Calculate peak coverage
+# 
+# qsub -N peakcov_"$QVAL"_"$NOLAMBDA" -hold_jid callpeaks_"$QVAL"_"$NOLAMBDA" \
+# ~/git_wynton_scripts/atac_counttable_bedcoverage.sh \
+# $OUTPUT_DIRECTORY \
+# $INPUT_DIRECTORY \
+# $PEAKS
 
 
 #Make count table, homer input files, volcano plot

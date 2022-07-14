@@ -21,6 +21,8 @@ ctrl_samples<-args[2:length(args)]
 }
 print(output_dir)
 
+print(ctrl_samples)
+
 coverage_files<-setdiff(list.files(), list.dirs(recursive = FALSE, full.names = FALSE))
 coverage_files_name<-str_split_fixed(coverage_files, "_coverage",2)[,1]
 coverage_file<-fread(coverage_files[1])
@@ -48,6 +50,8 @@ if(length(args)==1) {  #If no control samples are given, will attempt to search 
 } else {    #else will use control sample names to select controls
   ctrl_index<-match(ctrl_samples, colnames(counts)[2:ncol(counts)]) 
 }
+
+print(ctrl_index)
 
 group<-vector(mode = "character",length = ncol(counts)-1)
 group[ctrl_index]<-"c" #Mark controls 
