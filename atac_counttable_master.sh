@@ -124,7 +124,7 @@ given \
 $OUTPUT_DIRECTORY/homer_input/TestedPeaks_background.bed \
 10
 
-qsub -hold_jid count_table_"$QVAL"_"$NOLAMBDA" \ 
+qsub -hold_jid count_table_"$QVAL"_"$NOLAMBDA" \
 ~/git_wynton_scripts/homer_background.sh $OUTPUT_DIRECTORY/homer_output \
 $OUTPUT_DIRECTORY/homer_input/TestedPeaks_up_0.001.bed \
 mm10 \
