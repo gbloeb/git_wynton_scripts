@@ -66,8 +66,12 @@ write.csv(design_matrix,file = paste0("220703_gen_countTable_output/","design_ma
 y<-DGEList(counts = counts[,c(2:ncol(counts))],group=group,remove.zeros = TRUE,genes = counts[,c("names")])
 keep<-filterByExpr(y)
 
-pdf(paste0("220703_gen_countTable_output/","MDSplot.pdf"))
-plotMDS(y,labels = group)
+pdf(paste0("220703_gen_countTable_output/","MDSplot_group.pdf"))
+plotMDS(y,labels = group, gene.selection = "common")
+dev.off()
+
+pdf(paste0("220703_gen_countTable_output/","MDSplot_sample.pdf"))
+plotMDS(y, gene.selection = "common")
 dev.off()
 
 y<-y[keep, , keep.lib.sizes=FALSE]
