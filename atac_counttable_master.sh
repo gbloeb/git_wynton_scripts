@@ -75,14 +75,15 @@ fi
 
 mkdir $OUTPUT_DIRECTORY
 mkdir $OUTPUT_DIRECTORY/int_files
-
+mkdir $OUTPUT_DIRECTORY/log_files
 
 #Make bed file from all the samples to call peaks on
 cat $INPUT_DIRECTORY/*/aligned_mm10_exact/*_shift.bed > $OUTPUT_DIRECTORY/int_files/comb_shift.bed
 ls $INPUT_DIRECTORY/*/aligned_mm10_exact/*_shift.bed > $OUTPUT_DIRECTORY/int_files/files_in_comb_shift_bed.txt
 
 #Call peaks
-qsub -N callpeaks_"$QVAL"_"$NOLAMBDA" ~/git_wynton_scripts/macs3_callpeaks_frombed_noshift.sh \
+qsub -N callpeaks_"$QVAL"_"$NOLAMBDA" -o $OUTPUT_DIRECTORY/log_files/callpeaks_"$QVAL"_"$NOLAMBDA".log -j y  \
+~/git_wynton_scripts/macs3_callpeaks_frombed_noshift.sh \
 $OUTPUT_DIRECTORY/int_files/comb_shift.bed \
 $OUTPUT_DIRECTORY/int_files/ \
 2.3e9 \
@@ -94,6 +95,7 @@ $NOLAMBDA
 #Calculate peak coverage
 
 qsub -N peakcov_"$QVAL"_"$NOLAMBDA" -hold_jid callpeaks_"$QVAL"_"$NOLAMBDA" \
+-o $OUTPUT_DIRECTORY/log_files/peakcov_"$QVAL"_"$NOLAMBDA".log -j y  \
 ~/git_wynton_scripts/atac_counttable_bedcoverage.sh \
 $OUTPUT_DIRECTORY \
 $INPUT_DIRECTORY \
@@ -102,6 +104,7 @@ $PEAKS
 
 #Make count table, homer input files, volcano plot
 qsub -N count_table_"$QVAL"_"$NOLAMBDA" -hold_jid peakcov_"$QVAL"_"$NOLAMBDA" \
+-o $OUTPUT_DIRECTORY/log_files/count_table_"$QVAL"_"$NOLAMBDA".log -j y  \
 ~/git_wynton_scripts/220703_gen_countTable_calldiffpeaks.sh  $OUTPUT_DIRECTORY $CTRL1 $CTRL2 $CTRL3 $CTRL4 $CTRL5 
 
 mkdir $OUTPUT_DIRECTORY/homer_output
@@ -109,6 +112,7 @@ mkdir $OUTPUT_DIRECTORY/homer_output
 #Run homer
 #given bp
 qsub -hold_jid count_table_"$QVAL"_"$NOLAMBDA" \
+-o $OUTPUT_DIRECTORY/log_files/homer_background_up_0.05_given.log -j y  \
 ~/git_wynton_scripts/homer_background.sh $OUTPUT_DIRECTORY/homer_output \
 $OUTPUT_DIRECTORY/homer_input/TestedPeaks_up_0.05.bed \
 mm10 \
@@ -117,6 +121,7 @@ $OUTPUT_DIRECTORY/homer_input/TestedPeaks_background.bed \
 10
 
 qsub -hold_jid count_table_"$QVAL"_"$NOLAMBDA" \
+-o $OUTPUT_DIRECTORY/log_files/homer_background_up_0.01_given.log -j y  \
 ~/git_wynton_scripts/homer_background.sh $OUTPUT_DIRECTORY/homer_output \
 $OUTPUT_DIRECTORY/homer_input/TestedPeaks_up_0.01.bed \
 mm10 \
@@ -125,6 +130,7 @@ $OUTPUT_DIRECTORY/homer_input/TestedPeaks_background.bed \
 10
 
 qsub -hold_jid count_table_"$QVAL"_"$NOLAMBDA" \
+-o $OUTPUT_DIRECTORY/log_files/homer_background_up_0.001_given.log -j y  \
 ~/git_wynton_scripts/homer_background.sh $OUTPUT_DIRECTORY/homer_output \
 $OUTPUT_DIRECTORY/homer_input/TestedPeaks_up_0.001.bed \
 mm10 \
@@ -133,6 +139,7 @@ $OUTPUT_DIRECTORY/homer_input/TestedPeaks_background.bed \
 10
 
 qsub -hold_jid count_table_"$QVAL"_"$NOLAMBDA" \
+-o $OUTPUT_DIRECTORY/log_files/homer_background_down_0.05_given.log -j y  \
 ~/git_wynton_scripts/homer_background.sh $OUTPUT_DIRECTORY/homer_output \
 $OUTPUT_DIRECTORY/homer_input/TestedPeaks_down_0.05.bed \
 mm10 \
@@ -141,6 +148,7 @@ $OUTPUT_DIRECTORY/homer_input/TestedPeaks_background.bed \
 10
 
 qsub -hold_jid count_table_"$QVAL"_"$NOLAMBDA" \
+-o $OUTPUT_DIRECTORY/log_files/homer_background_down_0.01_given.log -j y  \
 ~/git_wynton_scripts/homer_background.sh $OUTPUT_DIRECTORY/homer_output \
 $OUTPUT_DIRECTORY/homer_input/TestedPeaks_down_0.01.bed \
 mm10 \
