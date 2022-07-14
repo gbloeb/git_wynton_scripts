@@ -18,10 +18,10 @@ dir.create("220703_gen_countTable_output")
 
 if(length(args)>1){                 #Not yet fully implemented, would allow indicating the control samples in the call of Rscript
 ctrl_samples<-args[2:length(args)]
+print(ctrl_samples)
 }
 print(output_dir)
 
-print(ctrl_samples)
 
 coverage_files<-setdiff(list.files(), list.dirs(recursive = FALSE, full.names = FALSE))
 coverage_files_name<-str_split_fixed(coverage_files, "_coverage",2)[,1]
